@@ -24,11 +24,11 @@ class ProductRequest extends FormRequest
     public function rules()
     {
         return [
-            'name'        => 'required',
-            'price'       => 'required|integer|min:0|max:10000',
-            'season'      => 'required',
-            'description' => 'required|max:120',
-            'image'       => 'required|mimes:png,jpeg|max:2048',
+            'name'         => 'required',
+            'price'        => 'required|integer|min:0|max:10000',
+            'seasons'      => 'required',
+            'description'  => 'required|max:120',
+            'image'        => 'required|mimes:png,jpeg|max:2048',
         ];
     }
 

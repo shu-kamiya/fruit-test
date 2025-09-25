@@ -10,4 +10,10 @@ class Product extends Model
     protected $fillable = [
         'name', 'price', 'season', 'description', 'image'
     ];
+
+    public function seasons()
+    {
+        return $this->belongsToMany(Season::class, 'product_season', 'product_id', 'season_id')
+                    ->withTimestamps();
+    }
 }

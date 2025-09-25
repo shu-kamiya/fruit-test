@@ -6,19 +6,20 @@ use App\Http\Requests\ProductRequest;
 use App\Models\Product;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
+use App\Models\Season;
 
 class ProductController extends Controller
 {
     public function index(Request $request)
     {
-        $search = $request->input('search', '');
         $sort = $request->input('sort', 'price_asc');
         $perPage = 6;
 
         $query = Product::query();
 
-        if (!empty($search)) {
-            $query->where('name', 'LIKE', '%' . $search . '%');
+        $keyword = $request->input('keyword');
+        if (!empty($keyword)) {
+            $query->where('name', 'LIKE', "%{$keyword}%");
         }
 
         if ($sort === 'price_asc') {
@@ -33,7 +34,7 @@ class ProductController extends Controller
 
         return view('products.index', [
             'products' => $products,
-            'search'   => $search,
+            'keyword'   => $keyword,
             'sort'     => $sort,
         ]);
     }
@@ -41,18 +42,21 @@ class ProductController extends Controller
     public function show($productId)
     {
         $product = Product::findOrFail($productId);
-        return view('products.show', compact('product'));
+        $seasons = Season::all();
+        return view('products.detail', compact('product', 'seasons'));
     }
 
     public function create()
     {
-        return view('products.register');
+        $seasons = Season::all();
+        return view('products.register', compact('seasons'));
     }
 
     public function edit($productId)
     {
         $product = Product::findOrFail($productId);
-        return view('products.edit', compact('product'));
+        $seasons = Season::all();
+        return view('products.edit', compact('product', 'seasons'));
     }
 
     public function store(ProductRequest $request)
@@ -62,13 +66,16 @@ class ProductController extends Controller
             $path = $request->file('image')->store('products', 'public');
         }
 
-        Product::create([
+        $product = Product::create([
             'name'        => $request->name,
             'price'       => $request->price,
-            'season'      => $request->season,
             'description' => $request->description,
             'image'       => $path,
         ]);
+
+        if ($request->filled('seasons')) {
+            $product->seasons()->attach($request->seasons);
+        }
 
         return redirect('/products')->with('success', '商品を登録しました');
     }
@@ -77,19 +84,23 @@ class ProductController extends Controller
     {
         $product = Product::findOrFail($productId);
 
-        if ($product->image && Storage::disk('public')->exists($product->image)) {
-            Storage::disk('public')->delete($product->image);
+        if ($request->hasFile('image')) {
+            if ($product->image && Storage::disk('public')->exists($product->image)) {
+                Storage::disk('public')->delete($product->image);
+            }
+            $path = $request->file('image')->store('products', 'public');
+        } else {
+            $path = $product->image;
         }
-
-        $path = $request->file('image')->store('products', 'public');
 
         $product->update([
             'name'        => $request->input('name'),
             'price'       => $request->input('price'),
-            'season'      => $request->input('season'),
             'description' => $request->input('description'),
             'image'       => $path,
         ]);
+
+        $product->seasons()->sync($request->seasons ?? []);
 
         return redirect('/products')->with('success', '商品を更新しました');
     }

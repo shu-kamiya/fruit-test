@@ -51,11 +51,16 @@
             <div class="register-form__group">
                 <label class="register-form__label">
                     季節<span class="register-form__required">必須</span>
+                    <span class="register-form__optional">複数選択可</span>
                 </label>
-                <input type="radio" name="season" value="春"> 春
-                <input type="radio" name="season" value="夏"> 夏
-                <input type="radio" name="season" value="秋"> 秋
-                <input type="radio" name="season" value="冬"> 冬
+                <div class="season-options">
+                    @foreach($seasons as $season)
+                    <label class="season-label">
+                        <input type="checkbox" name="seasons[]" value="{{ $season->id }}" class="season-checkbox">
+                        <span>{{ $season->name }}</span>
+                    </label>
+                    @endforeach
+                </div>
                 <p class="register-form__error-message">
                     @error('season')
                     {{ $message }}
