@@ -2,12 +2,11 @@
 
 ## 環境構築
 **Dockerビルド**
-1. `git clone git@github.com:estra-inc/confirmation-test-contact-form.git`
+1. `git clone git@github.com:Estra-Coachtech/laravel-docker-template.git`
 2. DockerDesktopアプリを立ち上げる
 3. `docker-compose up -d --build`
 
 mysql:
-    platform: linux/x86_64(この文追加)
     image: mysql:8.0.26
     environment:
 ```
@@ -16,7 +15,7 @@ mysql:
 1. `docker-compose exec php bash`
 2. `composer install`
 3. 「.env.example」ファイルを 「.env」ファイルに命名を変更。または、新しく.envファイルを作成
-4. .envに以下の環境変数を追加
+
 ``` text
 DB_CONNECTION=mysql
 DB_HOST=mysql
@@ -46,7 +45,7 @@ php artisan db:seed
 - MySQL8.0.26
 
 ## ER図
-src/graph.pdf
+- (images/ERD.png)
 
 ## URL
 - 開発環境：http://localhost/
